@@ -88,7 +88,7 @@ def create_list(user_id):
 
 @app.route('/api/lists/<int:list_id>/')
 def get_list(list_id):
-    movie_list = dao.get_movie_by_id(list_id)
+    movie_list = dao.get_movie_list_by_id(list_id)
     if movie_list is None:
         return failure_response('List not found')
     return success_response(movie_list)
