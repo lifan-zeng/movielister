@@ -17,7 +17,6 @@ with app.app_context():
 def success_response(data, code=200): 
     return json.dumps({"success": True, "data": data}), code
 
-
 def failure_response(message, code=404):
     return json.dumps({"success": False, "error": message}), code
 
@@ -61,11 +60,16 @@ def update_user(user_id):
 
 @app.route('/api/users/<int:user_id_1>/friend/<int:user_id_2>/', methods=['POST'])
 def add_friend(user_id_1, user_id_2):
-    user1 = dao.get_user_by_id(user_id_1)
-    user2 = dao.get_user_by_id(user_id_2)
     add = dao.add_user_as_friend(user_id_1, user_id_2)
     if add is None:
-        return failure_response('User(2) not found')
+        return failure_response('User(s) not found')
+    return success_response(add)
+
+@app.route('/api/users/<int:user_id_1>/unfriend/<int:user_id_2>/', methods=['POST'])
+def remove_friend(user_id_1, user_id_2):
+    add = dao.remove_user_as_friend(user_id_1, user_id_2)
+    if add is None:
+        return failure_response('Error occurred in removing friend')
     return success_response(add)
 
 @app.route('/api/lists/')
@@ -94,7 +98,7 @@ def update_list(list_id):
     body = json.loads(request.data)
     movie_list = dao.update_movie_list_by_id(list_id, body)
     if movie_list is None:
-        return failure_response('List not found')
+        return failure_response('Error occured in updating list')
     return success_response(movie_list)
 
 @app.route('/api/lists/<int:list_id>/', methods=['DELETE'])
@@ -123,6 +127,21 @@ def add_movie():
         director=body.get('director'),
         year=body.get('year')
     )
+    if movie is None:
+        return failure_response('Movie not found')
+    return success_response(movie)
+
+@app.route('/api/movies/<int:movie_id>/', methods=['POST'])
+def update_movie(movie_id):
+    body = json.loads(request.data)
+    movie = dao.update_movie_by_id(movie_id, body)
+    if movie is None:
+        return failure_response('Movie not found')
+    return success_response(movie)
+
+@app.route('/api/movies/<int:movie_id>/', methods=['DELETE'])
+def delete_movie(movie_id):
+    movie = dao.delete_movie_by_id(movie_id)
     if movie is None:
         return failure_response('Movie not found')
     return success_response(movie)
