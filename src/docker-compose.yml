@@ -1,0 +1,6 @@
+version: '3'
+services:
+    movielister:
+        image: lifanzeng/movielister
+        ports:
+            - "80:5000"
